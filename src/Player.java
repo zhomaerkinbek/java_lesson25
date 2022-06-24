@@ -7,6 +7,18 @@ public class Player {
     private int lose;
     private double percentWins;
     private Game status;
+    private boolean gameMode = true;
+
+    public boolean isGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(boolean gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public Player() {
+    }
 
     public int getWin() {
         return win;
@@ -49,38 +61,50 @@ public class Player {
     }
 
     public void getFinger(){
-        int number;
-        while (true) {
-            try {
-                number = checkNumber();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                continue;
+            int number;
+            while (true) {
+                try {
+                    number = checkNumber();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+                break;
             }
-            break;
-        }
-        if(number == 1){
-            setStatus(Game.ROCK);
-        } else if (number == 2) {
-            setStatus(Game.PAPER);
-        } else{
-            setStatus(Game.SCISSORS);
+        setFingers(number);
+    }
+
+    public void setFingers(int number){
+        switch (number) {
+            case 1 -> setStatus(Game.ROCK);
+            case 2 -> setStatus(Game.PAPER);
+            case 3 -> setStatus(Game.SCISSORS);
+            case 4 -> setStatus(Game.SPOCK);
+            case 5 -> setStatus(Game.LIZARD);
+            default -> throw new NoFingerException("Такой руки нету! Введите еще раз");
         }
     }
     public void getRandomFinger(){
+        int n;
         Random rnd = new Random();
-        int number = rnd.nextInt(3);
-        if(number == 0){
-            setStatus(Game.ROCK);
-        } else if (number == 1) {
-            setStatus(Game.PAPER);
-        } else{
-            setStatus(Game.SCISSORS);
+        if(isGameMode()){
+            n = 3;
+        } else {
+            n = 5;
         }
+        int number = rnd.nextInt(n);
+        setFingers(number + 1);
     }
 
     private int checkNumber() throws NoFingerException {
-        System.out.print("Введите номер какую руку хотите выбрасить (1. Камень, 2. Бумага, 3. Ножницы!): ");
+        int n;
+        if(isGameMode()){
+            n = 3;
+            System.out.print("Введите номер какую руку хотите выбрасить (1. Камень, 2. Бумага, 3. Ножницы): ");
+        } else {
+            n = 5;
+            System.out.print("Введите номер какую руку хотите выбрасить (1. Камень, 2. Бумага, 3. Ножницы, 4. Спок, 5. Ящерица): ");
+        }
         int number;
         Scanner sc = new Scanner(System.in);
         try {
@@ -94,7 +118,7 @@ public class Player {
                 number = checkNumber();
             }
         }
-        if(number < 1 | number > 3){
+        if(number < 1 | number > n){
             throw new NoFingerException("Такой руки нету! Введите еще раз");
         } else {
             return number;
@@ -104,12 +128,12 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
-                "win=" + win +
-                ", draw=" + draw +
-                ", lose=" + lose +
-                ", percentWins=" + percentWins +
-                '}';
+        String header = "┌──────────┬─────────────┬─────────┬─────────────┬─────────────────┐\n";
+        String names = String.format("│  %6s  │  %9s  │  %5s  │  %9s  │  %13s  │\n", "ПОБЕДА", "ПОРАЖЕНИЕ", "НИЧЬЯ", "ВСЕГО ИГР", "ПРОЦЕНТ ПОБЕД");
+        String line = "├──────────┼─────────────┼─────────┼─────────────┼─────────────────┤\n";
+        String text = String.format("│  %6s  │  %9s  │  %5s  │  %9s  │  %13s  │\n", win, lose, draw, (win+lose+draw), percentWins);
+        String footer = "└──────────┴─────────────┴─────────┴─────────────┴─────────────────┘";
+        return header + names + line + text + footer;
     }
 
 }
